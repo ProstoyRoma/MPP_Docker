@@ -1,10 +1,18 @@
 # Базовый образ
-FROM nginx:alpine
+FROM ubuntu:22.04
 
-# Копируем наш index.html в папку nginx
-COPY index.html /usr/share/nginx/html/index.html
+# Установка необходимых пакетов
+RUN apt-get update && apt-get install -y \
+    nginx \
+    mysql-server \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Открываем порт 80
-EXPOSE 80
+# Настройка Nginx
+COPY index.html /var/www/html/index.html
 
-# Nginx автоматически запускается при старте контейнера
+# Открываем порты
+EXPOSE 80 3306
+
+# Запуск служб при старте контейнера
+CMD service mysql start && nginx -g "daemon off;"
